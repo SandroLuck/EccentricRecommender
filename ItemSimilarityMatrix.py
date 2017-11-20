@@ -6,7 +6,6 @@ from tqdm import tqdm
 from statistics import mean,median
 from operator import itemgetter
 import matplotlib.pyplot as plt
-from loadAndSaveLilMatrix import load_sparse_matrix,save_sparse_matrix
 
 def limit_gen(iterable,stop):
     for index,value in enumerate(iterable):
@@ -24,6 +23,7 @@ def CalculateItemSimilarity(item1_users, item2_users, user_to_ecc):
         return mean([user_to_ecc[user] for user in intersection])
     else:
         return 0
+
 def outputSparseMatrixStats(spars_matrix, dict_item_id_to_users):
 
 
@@ -47,11 +47,7 @@ def outputSparseMatrixStats(spars_matrix, dict_item_id_to_users):
         print("Intersection Length:",len(intersection))
         print(50*"#")
 
-    #Aave the matrix
-    save_sparse_matrix('itemSimilarityMatrix', spars_matrix)
-
-
-def CreateItemSimilarityMatrix(threshold_min_movie_likes=30,threshold_max_movies=40):
+def CreateItemSimilarityMatrix(threshold_min_movie_likes=30,threshold_max_movies=200):
     user_to_ecc=createDictUserIdToUserEccentricity()
     print(100*"#")
     item_to_users=createDictMovieIdToUsersWhoLiked()
