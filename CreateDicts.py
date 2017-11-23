@@ -4,6 +4,8 @@ from tqdm import tqdm
 import pickle
 from pathlib import Path
 import os,inspect
+
+from loadAndSaveLilMatrix import create_or_load_sparse_matrix
 from load_or_create import load_or_create
 
 def createDictUserIdToUserEccentricity():
@@ -17,6 +19,22 @@ def createDictUserIdToUserEccentricity():
             user_id_to_user_ecc[int(line[0])]=float(line[1])
     return user_id_to_user_ecc
 
+def create_dict_user_id_to_liked_items():
+    print("Creating Dict create_dict_user_id_to_liked_items")
+    with open('userMlAboveAvg.dat', 'r') as uP:
+        to_return = dict()
+        readerP = csv.reader(uP, delimiter=" ")
+        tmpP = list(readerP)
+        # add all user who liked a movie x to its dict
+        for id, line in tqdm(enumerate(tmpP)):
+            for rat in line[1:]:
+                if int(id+1) in to_return:
+                    #id has to be +1 since userid starts from 1 and not 0
+                    to_return[id+1].append(rat)
+                else:
+                    to_return[id+1]=[rat]
+    return to_return
+
 def create_dict_ecc():
     print("Creating Dict create_dict_ecc")
     with open('itemEccentricity.dat', 'r') as IE:
@@ -29,20 +47,18 @@ def create_dict_ecc():
 
 def create_dict_user_id_to_recommends():
     #import only for this function
-    from CreateMatrix import create_matrix_item_similarity, create_matrix_user_likes
+    from CreateMatrix import get_recommendation_matrix
 
-    u_to_likes = load_or_create("/Matrix/UserIdToLikes.matrix", create_matrix_user_likes)
-    item_similarity = load_or_create("/Matrix/ItemSimilarityEccentricity.matrix", create_matrix_item_similarity)
+    mat = get_recommendation_matrix()
     print("Creating Dict create_dict_user_id_to_recommends")
-    mat = u_to_likes * item_similarity
+    print(type(mat))
     dict_userid_to_recommends = dict()
-    for i in range(mat.shape[1]):
-        row = mat.getrow(i)
+    for i in tqdm(range(int(mat.shape[1]*0.1))):
+        row = mat.getrow(i).toarray()[0].tolist()
         #we dont need to look at zero recommends
-        if len(row.nonzero()[0]) != 0:
+        if True:
             # print(u_to_likes.getrow(i).nonzero()[1])
-            if len(u_to_likes.getrow(i).nonzero()[1]) <= 5:
-                dict_userid_to_recommends[i + 1] = [(index + 1, val) for index, val in enumerate(row)]
+            dict_userid_to_recommends[i + 1] = [(index + 1, val) for index, val in enumerate(row) if val!=0]
     return dict_userid_to_recommends
 
 

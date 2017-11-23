@@ -17,11 +17,12 @@ def load_or_create(relative_path,function_to_exec):
     os.makedirs(os.path.dirname(my_file), exist_ok=True)
     my_file = Path(abs_file_name)
     if my_file.is_file():
-        print("Loading from file...")
+        print("Loading from file..."+str(relative_path))
         with open(my_file, 'rb') as handle:
             to_return = pickle.load(handle)
     else:
         with open(my_file, 'wb') as handle:
             to_return=function_to_exec()
+            print("Dumping to the returned value to file")
             pickle.dump(to_return, handle, protocol=pickle.HIGHEST_PROTOCOL)
     return to_return

@@ -33,6 +33,16 @@ def CalculateItemSimilarity(item1_users, item2_users, user_to_ecc):
     else:
         return 0
 
+def get_recommendation_matrix():
+    u_to_likes = load_or_create("/Matrix/UserIdToLikes.matrix", create_matrix_user_likes)
+    item_similarity = load_or_create("/Matrix/ItemSimilarityEccentricity.matrix", create_matrix_item_similarity)
+    print("Multiplying MAtrix")
+    mat=u_to_likes * item_similarity
+    print("Multiplication has been done")
+    return mat
+
+
+
 def create_matrix_user_likes():
     """
     return the matrix shape[max_user,max_movie_id]
@@ -56,7 +66,7 @@ def create_matrix_user_likes():
                 to_return[id, int(item) - 1] = True
     return to_return
 
-def create_matrix_item_similarity(threshold_min_movie_likes=50,threshold_max_movies=5000):
+def create_matrix_item_similarity(threshold_min_movie_likes=50,threshold_max_movies=1000):
     user_to_ecc = load_or_create('/Dict/UserIdToUserEccentricity.dict',createDictUserIdToUserEccentricity)
     item_to_users = load_or_create('/Dict/MovieIdToUsersWhoLiked.dict',createDictMovieIdToUsersWhoLiked)
     max_id = max(int(item_id) for item_id in item_to_users)
