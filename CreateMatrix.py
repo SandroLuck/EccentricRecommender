@@ -1,14 +1,8 @@
 import csv
-import pickle
-from pathlib import Path
-
-from tqdm import tqdm
-from scipy.sparse import lil_matrix,save_npz
+from scipy.sparse import lil_matrix
 import numpy as np
-import os,inspect
-from CreateDicts import createDictUserIdToUserEccentricity,createDictMovieIdToUsersWhoLiked
+from CreateDicts import createDictUserIdToUserEccentricity,createDictMovieIdToUsersWhoLiked,create_dict_ecc
 from load_or_create import load_or_create
-from statistics import mean
 
 def pos_or_zero(x):
     if x>=0:
@@ -25,8 +19,16 @@ def CalculateItemSimilarity(item1_users, item2_users, user_to_ecc):
     users2=set(item2_users)
     intersection=users1&users2
     if len(intersection)>=5:
-        res=mean([pos_or_zero(user_to_ecc[user]) for user in intersection])
-        if res>=0:
+        #res=mean([pos_or_zero(user_to_ecc[user]) for user in intersection])
+        sum=0
+        items=0
+        for i in intersection:
+            i_val=user_to_ecc[i]
+            if i_val>0:
+                sum+=pos_or_zero(user_to_ecc[i])
+                items+=1
+        if sum>0:
+            res = sum / float(items)
             return res
         else:
             return 0
@@ -41,16 +43,52 @@ def get_recommendation_matrix():
     print("Multiplication has been done")
     return mat
 
+def mix_matrix_for_ecc_and_none_ecc(mat_ecc, mat_none_ecc):
+    print("mixing mat for ecc and none ecc")
+    print(mat_ecc.shape,mat_none_ecc.shape)
+    assert mat_ecc.shape==mat_none_ecc.shape
+    user_to_ecc = load_or_create('/DICT/UserIdToUserEccentricity.dict',createDictUserIdToUserEccentricity)
+    mat=lil_matrix((mat_ecc.shape), dtype=np.float)
+    for i in range(int(mat.shape[0])):
+        try:
+            ecc=user_to_ecc[i+1]
+            if ecc>=0:
+                row=mat_ecc.getrow(i)
+            else:
+                row=mat_none_ecc.getrow(i)
+            mat[i, :] = row
+        except KeyError:
+            print(50*'-')
+            #this means we had  a key error in dict
+            pass
+    return mat
+
+def mix_matrix_for_ecc_and_none_ecc_with_alpha(mat_ecc, mat_none_ecc, alpha=0.0):
+    print("mixing mat for ecc and none ecc")
+    print(mat_ecc.shape,mat_none_ecc.shape)
+    assert mat_ecc.shape==mat_none_ecc.shape
+    #user_to_ecc = load_or_create('/DICT/UserIdToUserEccentricity.dict',createDictUserIdToUserEccentricity)
+    mat=lil_matrix((mat_ecc.shape), dtype=np.float)
+    for i in range(int(mat.shape[0])):
+        try:
+            #ecc=user_to_ecc[i+1]
+            mat[i, :] = mat_ecc.getrow(i)*alpha+mat_none_ecc.getrow(i)*(1-alpha)
+        except KeyError:
+            print(50*'-')
+            #this means we had  a key error in dict
+            pass
+    return mat
 
 
 def create_matrix_user_likes():
     """
     return the matrix shape[max_user,max_movie_id]
-    each entry i,j means user i liked item j
+    each entry i,j means user i liked item j, multiplied with user_eccentricity
     note: user_id-1 and item_id-1 are i and j, since movielense numerates ids from 1 but matrix numerates from 0
     :return: lil_matrix(shape=(max_user,max_movie_id))
     """
     print("Creating Matrix UserLikes")
+    user_to_ecc = load_or_create('/DICT/UserIdToUserEccentricity.dict',createDictUserIdToUserEccentricity)
     with open("userMlAboveAvg.dat", "r") as f:
         reader = csv.reader(f, delimiter=" ")
         items_liked = list(reader)
@@ -61,18 +99,22 @@ def create_matrix_user_likes():
         # User bool matrix since we only care about if liked or not
         to_return = lil_matrix((max_user_id, max_item_id), dtype=np.bool)
         # the first elem in userAboveAverage is not important
-        for id, item_ids in tqdm(enumerate(items_liked)):
+        for id, item_ids in enumerate(items_liked):
             for item in item_ids[1:]:
-                to_return[id, int(item) - 1] = True
+                # Currently only calculate positve eccentric people
+                if True:
+                    to_return[id, int(item) - 1] = True
     return to_return
 
-def create_matrix_item_similarity(threshold_min_movie_likes=50,threshold_max_movies=1000):
-    user_to_ecc = load_or_create('/Dict/UserIdToUserEccentricity.dict',createDictUserIdToUserEccentricity)
-    item_to_users = load_or_create('/Dict/MovieIdToUsersWhoLiked.dict',createDictMovieIdToUsersWhoLiked)
+def create_matrix_item_similarity(threshold_min_movie_likes=5,threshold_max_movies=2000000):
+    user_to_ecc = load_or_create('/DICT/UserIdToUserEccentricity.dict',createDictUserIdToUserEccentricity)
+    item_to_users = load_or_create('/DICT/MovieIdToUsersWhoLiked.dict',createDictMovieIdToUsersWhoLiked)
+    item_ecc = load_or_create('/DICT/MovieIdToItemEccentricity.dict', create_dict_ecc)
+
     max_id = max(int(item_id) for item_id in item_to_users)
     item_similarity_matrix = lil_matrix((max_id , max_id ), dtype=np.float)
     print("CREATING MATRIX ITEM SIMILARITY, might take long")
-    for index1, item1 in tqdm(enumerate(item_to_users)):
+    for index1, item1 in enumerate(item_to_users):
         # if enough users liked the movie
         # careful with id in dataset starts from 0 in matrix start from 0, thus -1
         if threshold_min_movie_likes <= len(item_to_users[item1]) <= threshold_max_movies:

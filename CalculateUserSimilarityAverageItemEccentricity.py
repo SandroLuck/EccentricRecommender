@@ -1,6 +1,5 @@
 import csv
 from operator import itemgetter
-from tqdm import tqdm
 from itertools import islice
 from statistics import median, mean
 from random import shuffle
@@ -55,7 +54,7 @@ def calculateUserSimilarityAverageItemEccentricityMatrix(percentageOfUsersToLook
                 print("Median eccentricity:",median(item_ecc_dict.values()))
                 median_ecc=median(item_ecc_dict.values())
                 count_percentage_of_movies_bigger_zero(item_ecc_dict,item_dict_names,min_ecc, max_ecc, median_ecc)
-                for user_1 in tqdm(take(user_amount_to_process,user_item_dict)):
+                for user_1 in take(user_amount_to_process,user_item_dict):
                     #only if the user is an eccentric user calculate
                     if user_dict_ecc[user_1]>=0:
                         for user_2 in take(user_amount_to_process,user_item_dict):

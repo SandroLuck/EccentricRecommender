@@ -2,10 +2,8 @@ from scipy.sparse import lil_matrix,save_npz
 import numpy as np
 from CreateDicts import createDictUserIdToUserEccentricity, createDictMovieIdToUsersWhoLiked,create_dict_names,create_dict_ecc
 from logMovieStats import item_names_print
-from tqdm import tqdm
 from statistics import mean,median
 from operator import itemgetter
-import matplotlib.pyplot as plt
 
 def limit_gen(iterable,stop):
     for index,value in enumerate(iterable):
@@ -47,7 +45,7 @@ def outputSparseMatrixStats(spars_matrix, dict_item_id_to_users):
         print("Intersection Length:",len(intersection))
         print(50*"#")
 
-def CreateItemSimilarityMatrix(threshold_min_movie_likes=30,threshold_max_movies=200):
+def CreateItemSimilarityMatrix(threshold_min_movie_likes=5,threshold_max_movies=2000000):
     user_to_ecc=createDictUserIdToUserEccentricity()
     print(100*"#")
     item_to_users=createDictMovieIdToUsersWhoLiked()
@@ -62,10 +60,8 @@ def CreateItemSimilarityMatrix(threshold_min_movie_likes=30,threshold_max_movies
 
     print("Mean length:",mean([len(list(item_to_users[item1])) for item1 in item_to_users]))
     print("Median length:",median([len(list(item_to_users[item1])) for item1 in item_to_users]))
-    plt.hist([len(list(item_to_users[item1])) for item1 in item_to_users],bins=1000)
-    #plt.show()
 
-    for index1,item1 in tqdm(enumerate(item_to_users)):
+    for index1,item1 in enumerate(item_to_users):
         # if enough users liked the movie
         if threshold_min_movie_likes<= len(item_to_users[item1]) <= threshold_max_movies:
             for index2,item2 in limit_gen(enumerate(item_to_users),index1):

@@ -2,8 +2,6 @@ import csv
 import numpy as np
 from scipy.sparse import lil_matrix
 from tqdm import tqdm
-from contextlib import contextmanager
-from timeit import default_timer
 from operator import itemgetter
 
 
@@ -78,14 +76,6 @@ def CreatItemEccentricitySimilarity(threshold_EUS=0.1):
                 #print("i i diag is:",item[4])
                 #print("j j diag is:",item[5])
                 test_out.write(str(item[3])+","+str(item[4])+","+str(item[5])+"\n")
-
-@contextmanager
-def elapsed_timer():
-    start = default_timer()
-    elapser = lambda: default_timer() - start
-    yield lambda: elapser()
-    end = default_timer()
-    elapser = lambda: end-start
 
 def create_dict_names():
     with open('movies.csv','r', encoding='utf-8') as item_names:

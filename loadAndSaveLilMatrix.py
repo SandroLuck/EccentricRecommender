@@ -1,6 +1,4 @@
-import random
 import scipy.sparse as sparse
-import scipy.io
 import numpy as np
 import os,inspect
 from pathlib import Path

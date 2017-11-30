@@ -1,6 +1,5 @@
 import csv
 from contextlib import contextmanager
-from tqdm import tqdm
 import pickle
 from pathlib import Path
 import os,inspect
@@ -15,7 +14,7 @@ def createDictUserIdToUserEccentricity():
         readerE = csv.reader(uE, delimiter=" ")
         tmpE = list(readerE)
         # add all user who liked a movie x to its dict
-        for line in tqdm(tmpE):
+        for line in tmpE:
             user_id_to_user_ecc[int(line[0])]=float(line[1])
     return user_id_to_user_ecc
 
@@ -26,7 +25,7 @@ def create_dict_user_id_to_liked_items():
         readerP = csv.reader(uP, delimiter=" ")
         tmpP = list(readerP)
         # add all user who liked a movie x to its dict
-        for id, line in tqdm(enumerate(tmpP)):
+        for id, line in enumerate(tmpP):
             for rat in line[1:]:
                 if int(id+1) in to_return:
                     #id has to be +1 since userid starts from 1 and not 0
@@ -49,11 +48,12 @@ def create_dict_user_id_to_recommends():
     #import only for this function
     from CreateMatrix import get_recommendation_matrix
 
-    mat = get_recommendation_matrix()
+    #
+    mat = get_recommendation_matrix()[:10000,:20000]
     print("Creating Dict create_dict_user_id_to_recommends")
     print(type(mat))
     dict_userid_to_recommends = dict()
-    for i in tqdm(range(int(mat.shape[1]*0.1))):
+    for i in range(int(mat.shape[0])):
         row = mat.getrow(i).toarray()[0].tolist()
         #we dont need to look at zero recommends
         if True:
@@ -61,6 +61,19 @@ def create_dict_user_id_to_recommends():
             dict_userid_to_recommends[i + 1] = [(index + 1, val) for index, val in enumerate(row) if val!=0]
     return dict_userid_to_recommends
 
+
+def create_dict_user_id_to_recommends_from_mat(mat):
+    mat = mat
+    print("Creating Dict create_dict_user_id_to_recommends")
+    print(type(mat))
+    dict_userid_to_recommends = dict()
+    for i in range(int(mat.shape[0])):
+        row = mat.getrow(i).toarray()[0].tolist()
+        #we dont need to look at zero recommends
+        if True:
+            # print(u_to_likes.getrow(i).nonzero()[1])
+            dict_userid_to_recommends[i + 1] = [(index + 1, val) for index, val in enumerate(row) if val!=0]
+    return dict_userid_to_recommends
 
 def create_dict_names():
     print("Creating Dict create_dict_names")
@@ -82,7 +95,7 @@ def createDictMovieIdToUsersWhoLiked():
         readerP = csv.reader(uP, delimiter=" ")
         tmpP = list(readerP)
         # add all user who liked a movie x to its dict
-        for id, line in tqdm(enumerate(tmpP)):
+        for id, line in enumerate(tmpP):
             for rat in line[1:]:
                 if int(rat) in to_return:
                     #id has to be +1 since userid starts from 1 and not 0
