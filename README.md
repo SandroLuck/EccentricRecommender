@@ -27,3 +27,5 @@ follow the steps in the document.
 All functions are present the input-files might have to be renamed.
 ## Good to know
 On the first run, the system will created the dictionaries, which will speed up computation on the following runs.
+If someone is changing the system, it is important to delete the related dictonarie.
+If this is not done strange results might be created.
