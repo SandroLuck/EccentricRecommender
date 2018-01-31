@@ -6,6 +6,10 @@ from random import shuffle
 
 
 def calculateUserSimilarityAverageItemEccentricityMatrix(percentageOfUsersToLookAt=1.0):
+    """
+    Calculate User Similarity and output to file
+    :param percentageOfUsersToLookAt: only look at subset of users, by percentage
+    """
     with open('userMlAboveAvg.dat', 'r') as u:
         with open('userEccentricity.dat', 'r') as UE:
             with open('itemEccentricity.dat', 'r') as IE:

@@ -16,8 +16,8 @@ def calculateMovieEccentricityIndex():
     movieid, zscore(sum(user_who_liked_eccentricity)/amount_positive_interaction_for_movie)
     :type ratingForLike: specifiy above which rating is considered a like
     """
-    with open('userMlAboveAvg.dat', 'r') as uP:
-        with open('userMlBelowAvg.dat', 'r') as uN:
+    with open('mlm1uabove.dat', 'r') as uP:
+        with open('mlm1ubelow.dat', 'r') as uN:
             with open('movieRarity.dat', 'w+') as rarity:
                 with open('userEccentricity.dat', 'w+') as user_eccentricity_out:
                     with open('itemEccentricity.dat', 'w+') as item_eccentricity_out:

@@ -8,6 +8,10 @@ from loadAndSaveLilMatrix import create_or_load_sparse_matrix
 from load_or_create import load_or_create
 
 def createDictUserIdToUserEccentricity():
+    """
+    Creates a dict user->User Eccentricity
+    :return: dict
+    """
     print("Creating Dict createDictUserIdToUserEccentricity")
     user_id_to_user_ecc=dict()
     with open('userEccentricity.dat', 'r') as uE:
@@ -19,8 +23,12 @@ def createDictUserIdToUserEccentricity():
     return user_id_to_user_ecc
 
 def create_dict_user_id_to_liked_items():
+    """
+    Creates a dict user->to list of liked items
+    :return: dict
+    """
     print("Creating Dict create_dict_user_id_to_liked_items")
-    with open('userMlAboveAvg.dat', 'r') as uP:
+    with open('mlm1uabove.dat', 'r') as uP:
         to_return = dict()
         readerP = csv.reader(uP, delimiter=" ")
         tmpP = list(readerP)
@@ -35,6 +43,10 @@ def create_dict_user_id_to_liked_items():
     return to_return
 
 def create_dict_ecc():
+    """
+    Creates a dict item->Item Eccentricity
+    :return: dict
+    """
     print("Creating Dict create_dict_ecc")
     with open('itemEccentricity.dat', 'r') as IE:
         reader = csv.reader(IE, delimiter=" ")
@@ -46,6 +58,11 @@ def create_dict_ecc():
 
 def create_dict_user_id_to_recommends():
     #import only for this function
+    """
+    Creates a dict user->to recommendation for the user
+    old approach
+    :return: dict
+    """
     from CreateMatrix import get_recommendation_matrix
 
     #
@@ -63,6 +80,12 @@ def create_dict_user_id_to_recommends():
 
 
 def create_dict_user_id_to_recommends_from_mat(mat):
+    """
+    Creates a dict user->recommendations
+    from a matrix
+    :param mat: matrix to use
+    :return:
+    """
     mat = mat
     print("Creating Dict create_dict_user_id_to_recommends")
     print(type(mat))
@@ -73,9 +96,15 @@ def create_dict_user_id_to_recommends_from_mat(mat):
         if True:
             # print(u_to_likes.getrow(i).nonzero()[1])
             dict_userid_to_recommends[i + 1] = [(index + 1, val) for index, val in enumerate(row) if val!=0]
+
     return dict_userid_to_recommends
 
 def create_dict_names():
+    """
+    item->name of item
+    can be used for analyzing
+    :return:
+    """
     print("Creating Dict create_dict_names")
     with open('movies.csv','r', encoding='utf-8') as item_names:
         reader = csv.reader(item_names, delimiter=",")
@@ -89,8 +118,12 @@ def create_dict_names():
         return dict_names
 
 def createDictMovieIdToUsersWhoLiked():
+    """
+    Creates a dict items->to user who liked this item
+    :return:
+    """
     print("Creating Dict createDictMovieIdToUsersWhoLiked")
-    with open('userMlAboveAvg.dat', 'r') as uP:
+    with open('mlm1uabove.dat', 'r') as uP:
         to_return = dict()
         readerP = csv.reader(uP, delimiter=" ")
         tmpP = list(readerP)

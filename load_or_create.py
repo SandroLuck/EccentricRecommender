@@ -7,6 +7,7 @@ from pathlib import Path
 def load_or_create(relative_path,function_to_exec):
     """
     return saved version or generates and returns
+    does not work on windows and some python versions
     example:a=load_or_create("/Matrix/UIDToLikes.matrix",create_matrix_user_likes)
     :param relative_path: relative path in / format where last string will be filename
     :param function_to_exec: a function which generates what to store

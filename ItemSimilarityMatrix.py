@@ -11,6 +11,13 @@ def limit_gen(iterable,stop):
             return
         yield value
 def CalculateItemSimilarity(item1_users, item2_users, user_to_ecc):
+    """
+    Calculate similarity between two user, by user user Eccentric similarity
+    :param item1_users:
+    :param item2_users:
+    :param user_to_ecc:
+    :return:
+    """
     users1=set(item1_users)
     users2=set(item2_users)
 
@@ -25,6 +32,11 @@ def CalculateItemSimilarity(item1_users, item2_users, user_to_ecc):
 def outputSparseMatrixStats(spars_matrix, dict_item_id_to_users):
 
 
+    """
+    Analyzing for Matrix
+    :param spars_matrix:
+    :param dict_item_id_to_users:
+    """
     ecc_item_sim_nonzero = spars_matrix.nonzero()
     dict_names=create_dict_names()
     dict_item_ecc=create_dict_ecc()
@@ -46,6 +58,11 @@ def outputSparseMatrixStats(spars_matrix, dict_item_id_to_users):
         print(50*"#")
 
 def CreateItemSimilarityMatrix(threshold_min_movie_likes=5,threshold_max_movies=2000000):
+    """
+    Creates matrix similarty
+    :param threshold_min_movie_likes:
+    :param threshold_max_movies:
+    """
     user_to_ecc=createDictUserIdToUserEccentricity()
     print(100*"#")
     item_to_users=createDictMovieIdToUsersWhoLiked()
